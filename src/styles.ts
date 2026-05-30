@@ -1,0 +1,56 @@
+import { StyleSheet } from 'react-native';
+
+export const colors = {
+  bg: '#F7F1E8',
+  card: '#FFFFFF',
+  text: '#25211D',
+  sub: '#6C625A',
+  muted: '#A79B90',
+  primary: '#7C4DFF',
+  primaryDark: '#5B35C8',
+  green: '#2E7D32',
+  red: '#C62828',
+  orange: '#E07A21',
+  border: '#E5DCD2',
+  chip: '#EFE8FF',
+};
+
+export const shadow = {
+  shadowColor: '#000',
+  shadowOpacity: 0.07,
+  shadowRadius: 10,
+  shadowOffset: { width: 0, height: 4 },
+  elevation: 3,
+};
+
+export const styles = StyleSheet.create({
+  app: { flex: 1, backgroundColor: colors.bg },
+  container: { padding: 16, paddingBottom: 110 },
+  title: { fontSize: 28, fontWeight: '800', color: colors.text, marginBottom: 8 },
+  h2: { fontSize: 20, fontWeight: '800', color: colors.text, marginTop: 16, marginBottom: 8 },
+  h3: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 4 },
+  text: { fontSize: 14, color: colors.text, lineHeight: 21 },
+  sub: { fontSize: 13, color: colors.sub, lineHeight: 20 },
+  tiny: { fontSize: 11, color: colors.muted },
+  card: { backgroundColor: colors.card, borderRadius: 18, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: colors.border, ...shadow },
+  row: { flexDirection: 'row', alignItems: 'center' },
+  rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: { paddingHorizontal: 10, paddingVertical: 6, backgroundColor: colors.chip, borderRadius: 999, marginRight: 6, marginBottom: 6 },
+  chipText: { color: colors.primaryDark, fontWeight: '700', fontSize: 12 },
+  button: { backgroundColor: colors.primary, borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', justifyContent: 'center' },
+  buttonText: { color: '#fff', fontWeight: '800', fontSize: 14 },
+  secondaryButton: { borderWidth: 1, borderColor: colors.border, borderRadius: 14, paddingVertical: 11, paddingHorizontal: 14, backgroundColor: '#FFF' },
+  secondaryText: { color: colors.text, fontWeight: '700', fontSize: 14, textAlign: 'center' },
+  dangerButton: { borderWidth: 1, borderColor: '#F3C2C2', borderRadius: 14, paddingVertical: 11, paddingHorizontal: 14, backgroundColor: '#FFF7F7' },
+  dangerText: { color: colors.red, fontWeight: '700', fontSize: 14, textAlign: 'center' },
+  input: { borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 12, backgroundColor: '#fff', color: colors.text, minHeight: 46, marginBottom: 8 },
+  textarea: { borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 12, backgroundColor: '#fff', color: colors.text, minHeight: 140, textAlignVertical: 'top', marginBottom: 8 },
+  tabbar: { position: 'absolute', left: 10, right: 10, bottom: 12, backgroundColor: '#fff', borderRadius: 24, paddingVertical: 8, paddingHorizontal: 8, flexDirection: 'row', justifyContent: 'space-around', borderWidth: 1, borderColor: colors.border, ...shadow },
+  tab: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6, paddingVertical: 8, borderRadius: 16, minWidth: 52 },
+  tabActive: { backgroundColor: colors.chip },
+  tabText: { fontSize: 11, color: colors.sub, fontWeight: '700' },
+  tabTextActive: { color: colors.primaryDark },
+  progressOuter: { height: 10, backgroundColor: '#EFE6DB', borderRadius: 99, overflow: 'hidden', marginTop: 8 },
+  progressInner: { height: 10, backgroundColor: colors.primary, borderRadius: 99 },
+});
