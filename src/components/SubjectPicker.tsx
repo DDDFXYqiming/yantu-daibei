@@ -1,11 +1,11 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { Subject } from '../types';
+import { ExamType, Subject } from '../types';
+import { getSubjectsForExam } from '../services/exam';
 import { colors, styles } from '../styles';
 
-const subjects: Subject[] = ['英语', '专业课', '政治', '复试', '调剂', '其他'];
-
-export function SubjectPicker({ value, onChange }: { value: Subject; onChange: (subject: Subject) => void }) {
+export function SubjectPicker({ value, onChange, examType = '考研' }: { value: Subject; onChange: (subject: Subject) => void; examType?: ExamType }) {
+  const subjects = getSubjectsForExam(examType);
   return (
     <View style={[styles.wrap, { marginBottom: 8 }]}>
       {subjects.map((subject) => (

@@ -10,8 +10,12 @@ function env(name: string): string | undefined {
   return process?.env?.[name];
 }
 
-function useMock(): boolean {
-  return env('EXPO_PUBLIC_USE_MOCK_PURCHASES') !== 'false';
+function now(): string {
+  return new Date().toISOString();
+}
+
+function localState(isPremium: boolean): PurchaseState {
+  return { isPremium, source: 'local', checkedAt: now() };
 }
 
 function getApiKey(): string | undefined {
@@ -20,18 +24,24 @@ function getApiKey(): string | undefined {
     : env('EXPO_PUBLIC_REVENUECAT_ANDROID_KEY');
 }
 
+function nativePurchasesEnabled(): boolean {
+  return env('EXPO_PUBLIC_ENABLE_STORE_PURCHASES') === 'true'
+    && env('EXPO_PUBLIC_USE_MOCK_PURCHASES') === 'false'
+    && !!getApiKey();
+}
+
 async function getPurchasesModule(): Promise<any | null> {
   try {
     const mod = require('react-native-purchases');
     return mod?.default ?? mod;
   } catch (error) {
-    console.warn('RevenueCat SDK not available, falling back to mock purchases.', error);
+    console.warn('Native purchase module unavailable; using local purchase state.', error);
     return null;
   }
 }
 
 export async function configurePurchases(): Promise<void> {
-  if (useMock()) return;
+  if (!nativePurchasesEnabled()) return;
   const apiKey = getApiKey();
   if (!apiKey) return;
   const Purchases = await getPurchasesModule();
@@ -40,47 +50,47 @@ export async function configurePurchases(): Promise<void> {
 }
 
 export async function getPremiumStatus(localFallback: boolean): Promise<PurchaseState> {
-  if (useMock()) return { isPremium: localFallback, source: 'mock', checkedAt: new Date().toISOString() };
+  if (!nativePurchasesEnabled()) return localState(localFallback);
   const Purchases = await getPurchasesModule();
-  if (!Purchases?.getCustomerInfo) return { isPremium: localFallback, source: 'none', checkedAt: new Date().toISOString() };
+  if (!Purchases?.getCustomerInfo) return { isPremium: localFallback, source: 'none', checkedAt: now() };
   try {
     const info = await Purchases.getCustomerInfo();
     return {
       isPremium: !!info?.entitlements?.active?.[ENTITLEMENT],
-      source: 'revenuecat',
-      checkedAt: new Date().toISOString(),
+      source: 'store',
+      checkedAt: now(),
     };
   } catch (error) {
-    console.warn('Failed to check RevenueCat entitlement', error);
-    return { isPremium: localFallback, source: 'none', checkedAt: new Date().toISOString() };
+    console.warn('Failed to check store entitlement', error);
+    return { isPremium: localFallback, source: 'none', checkedAt: now() };
   }
 }
 
 export async function purchaseLifetime(): Promise<PurchaseState> {
-  if (useMock()) return { isPremium: true, source: 'mock', checkedAt: new Date().toISOString() };
+  if (!nativePurchasesEnabled()) return localState(true);
   const Purchases = await getPurchasesModule();
   if (!Purchases?.getOfferings || !Purchases?.purchasePackage) {
-    throw new Error('RevenueCat SDK not available. Use a development build and install react-native-purchases.');
+    throw new Error('Store purchase module is not available.');
   }
   const offerings = await Purchases.getOfferings();
   const pkg = offerings?.current?.availablePackages?.[0];
-  if (!pkg) throw new Error('No RevenueCat package found. Configure offering: default / pro_lifetime.');
+  if (!pkg) throw new Error('No purchase package found.');
   const result = await Purchases.purchasePackage(pkg);
   return {
     isPremium: !!result?.customerInfo?.entitlements?.active?.[ENTITLEMENT],
-    source: 'revenuecat',
-    checkedAt: new Date().toISOString(),
+    source: 'store',
+    checkedAt: now(),
   };
 }
 
-export async function restorePurchases(): Promise<PurchaseState> {
-  if (useMock()) return { isPremium: true, source: 'mock', checkedAt: new Date().toISOString() };
+export async function restorePurchases(localFallback = false): Promise<PurchaseState> {
+  if (!nativePurchasesEnabled()) return localState(localFallback);
   const Purchases = await getPurchasesModule();
-  if (!Purchases?.restorePurchases) throw new Error('RevenueCat SDK not available.');
+  if (!Purchases?.restorePurchases) throw new Error('Store purchase module is not available.');
   const info = await Purchases.restorePurchases();
   return {
     isPremium: !!info?.entitlements?.active?.[ENTITLEMENT],
-    source: 'revenuecat',
-    checkedAt: new Date().toISOString(),
+    source: 'store',
+    checkedAt: now(),
   };
 }
