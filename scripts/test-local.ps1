@@ -3,14 +3,32 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')
 Set-Location -LiteralPath $projectRoot
 
-$env:ANDROID_HOME = 'E:\Android\Sdk'
-$env:ANDROID_SDK_ROOT = 'E:\Android\Sdk'
-$env:GRADLE_USER_HOME = 'E:\Android\Gradle'
-$env:ANDROID_USER_HOME = 'E:\Android\UserHome'
-$env:ANDROID_AVD_HOME = 'E:\Android\Avd'
-$env:NPM_CONFIG_CACHE = 'E:\AI_Projects\ModelCache\npm'
+$localToolRoot = Join-Path $projectRoot '.local-tools'
+
+if (-not $env:ANDROID_HOME) {
+  $env:ANDROID_HOME = Join-Path $localToolRoot 'android-sdk'
+}
+if (-not $env:ANDROID_SDK_ROOT) {
+  $env:ANDROID_SDK_ROOT = $env:ANDROID_HOME
+}
+if (-not $env:GRADLE_USER_HOME) {
+  $env:GRADLE_USER_HOME = Join-Path $localToolRoot 'gradle'
+}
+if (-not $env:ANDROID_USER_HOME) {
+  $env:ANDROID_USER_HOME = Join-Path $localToolRoot 'android-user-home'
+}
+if (-not $env:ANDROID_AVD_HOME) {
+  $env:ANDROID_AVD_HOME = Join-Path $localToolRoot 'android-avd'
+}
+if (-not $env:NPM_CONFIG_CACHE) {
+  $env:NPM_CONFIG_CACHE = Join-Path $localToolRoot 'npm-cache'
+}
 $env:NODE_OPTIONS = '--max-old-space-size=8192'
-$env:Path = 'E:\Android\Sdk\platform-tools;E:\Android\Sdk\cmdline-tools\latest\bin;' + $env:Path
+$androidPathEntries = @(
+  (Join-Path $env:ANDROID_HOME 'platform-tools'),
+  (Join-Path $env:ANDROID_HOME 'cmdline-tools\latest\bin')
+)
+$env:Path = (($androidPathEntries + $env:Path) -join [System.IO.Path]::PathSeparator)
 
 function Invoke-Checked {
   param(
